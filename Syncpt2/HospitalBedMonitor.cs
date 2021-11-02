@@ -36,8 +36,9 @@ namespace HospitalBed
                 catch (InvalidOperationException)
                 {
                     ///IOE means that Take() was called on a completed collection
+                    Console.WriteLine("No more data expected");
                 }
-                Console.WriteLine("No more data expected");
+
             }
         }
     }
