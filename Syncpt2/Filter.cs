@@ -12,7 +12,7 @@ namespace HospitalBed
         private readonly BlockingCollection<DataContainer> _dataQueue;
         public int TrueCounter { get; set; }
         public int FalseCounter { get; set; }
-        
+
 
         public Filter(BlockingCollection<DataContainer> dataContainer)
         {

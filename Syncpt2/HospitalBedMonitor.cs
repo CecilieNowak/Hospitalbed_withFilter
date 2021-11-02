@@ -5,39 +5,36 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Hospitalbed_withFilter;
 
 namespace HospitalBed
 {
     class HospitalBedMonitor
     {
-        private readonly BlockingCollection<DataContainer> _dataQueue;
-        private readonly Filter _filter;
+        private readonly DataContainer _dataContainer;
+        private readonly AutoResetEvent _sensorDataReadyEvent;
+        private readonly AutoResetEvent _sensorDataConsumedEvent;
 
-        public HospitalBedMonitor(BlockingCollection<DataContainer> dataQueue, Filter filter)
+        private readonly Filter _filter;
+        private readonly Buzzer _buzzer;
+
+        public HospitalBedMonitor(DataContainer dataContainer, AutoResetEvent sensorDataReadyEvent, AutoResetEvent sensorDataConsumedEvent)
         {
-            _dataQueue = dataQueue;
-            _filter = filter;
+            _sensorDataConsumedEvent = sensorDataConsumedEvent;
+            _sensorDataReadyEvent = sensorDataReadyEvent;
+            _dataContainer = dataContainer;
         }
 
         public void Run()
         {
-            while (!_dataQueue.IsCompleted)
+            while (true)
             {
-                try
-                {
-                    var container = _dataQueue.Take();
-                    bool present = container.GetPatientPresent();
-                    bool filter = _filter.Filter_container(container);
-
-
-                    System.Console.WriteLine("The patient is out of bed: {0}", present);
-
-                }
-                catch (InvalidOperationException)
-                {
-                    ///IOE means that Take() was called on a completed collection
-                    Console.WriteLine("No more data expected");
-                }
+                _sensorDataReadyEvent.WaitOne();
+                bool rand = _dataContainer.GetPatientPresent();
+                
+                _sensorDataConsumedEvent.Set();
+                
+                if (_filter.Filter_container())
 
             }
         }

@@ -11,27 +11,34 @@ namespace HospitalBed
 {
     class SensorReader
     {
-        private readonly BlockingCollection<DataContainer> _dataQueue;
+        private readonly DataContainer _dataContainer;
+        private readonly AutoResetEvent _dataConsumedEvent;
+        private readonly AutoResetEvent _dataReadyEvent;
+
+        //private readonly BlockingCollection<DataContainer> _dataQueue;
         private readonly RandomBooleanGenerator _booleanGenerator = new RandomBooleanGenerator();
 
-        public SensorReader(BlockingCollection<DataContainer> dataQueue)
+        public SensorReader(DataContainer dataContainer, AutoResetEvent dataConsumedEvent, AutoResetEvent dataReadyEvent)
         {
-            _dataQueue = dataQueue;
+            _dataContainer = dataContainer;
+            _dataConsumedEvent = dataConsumedEvent;
+            _dataReadyEvent = dataReadyEvent;
         }
 
         public void Run()
         {
-            int cnt = 50;
-            while (cnt > 0)
+            
+            while (true)
             {
-                bool present = _booleanGenerator.booleanRandom();
-                DataContainer reading = new DataContainer();
-                reading.SetPatientPresent(present);
-                _dataQueue.Add(reading);
-                Thread.Sleep(10);
-                cnt--;
+                _dataConsumedEvent.WaitOne();
+                bool rand = _booleanGenerator.booleanRandom();
+                _dataContainer.SetPatientPresent(rand);
+                _dataReadyEvent.Set();
+                Thread.Sleep(1000);
+                
+   
             }
-            _dataQueue.CompleteAdding();
+            
         }
         
 }

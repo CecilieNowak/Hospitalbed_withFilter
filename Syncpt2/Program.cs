@@ -8,11 +8,16 @@ namespace HospitalBed
     {
         static void Main(string[] args)
         {
-            BlockingCollection<DataContainer> dataQueue = new BlockingCollection<DataContainer>();
+            AutoResetEvent dataConsumedEvent = new AutoResetEvent(true);
+            AutoResetEvent dataReadyEvent = new AutoResetEvent(false);
 
+            DataContainer dataContainer = new DataContainer();
+            
+            //Consumer
+            HospitalBedMonitor hospitalBedMonitor = new HospitalBedMonitor(dataContainer, dataConsumedEvent, dataReadyEvent);
 
-            HospitalBedMonitor hospitalBedMonitor = new HospitalBedMonitor(dataQueue, new Filter(dataQueue));
-            SensorReader sensorReader = new SensorReader(dataQueue);
+            //Producer
+            SensorReader sensorReader = new SensorReader(dataContainer, dataReadyEvent, dataConsumedEvent);
 
             Thread hospitalBedMonitorThread = new Thread(hospitalBedMonitor.Run);
             Thread sensorReaderThread = new Thread(sensorReader.Run);
