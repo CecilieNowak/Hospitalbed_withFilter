@@ -11,7 +11,7 @@ namespace HospitalBed
             BlockingCollection<DataContainer> dataQueue = new BlockingCollection<DataContainer>();
 
 
-            HospitalBedMonitor hospitalBedMonitor = new HospitalBedMonitor(dataQueue);
+            HospitalBedMonitor hospitalBedMonitor = new HospitalBedMonitor(dataQueue, new Filter(dataQueue));
             SensorReader sensorReader = new SensorReader(dataQueue);
 
             Thread hospitalBedMonitorThread = new Thread(hospitalBedMonitor.Run);

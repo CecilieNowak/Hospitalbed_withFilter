@@ -23,7 +23,7 @@ namespace HospitalBed
 
         public bool Filter_container(DataContainer dataContainer)
         {
-
+            bool result = true;
             if (dataContainer.GetPatientPresent() == false)
             {
                 TrueCounter = 0;
@@ -31,7 +31,7 @@ namespace HospitalBed
                 if (FalseCounter == 3)
                 {
                     FalseCounter = 0;
-                    return false;
+                    result = false;
                 }
             }
 
@@ -42,10 +42,12 @@ namespace HospitalBed
                 if (TrueCounter == 3)
                 {
                     TrueCounter = 0;
-                    return true;
+                    result = true;
                 }
             }
-            
+
+            return result;
+
         }
 
     }
